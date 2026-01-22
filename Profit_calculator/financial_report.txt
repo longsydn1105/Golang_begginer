@@ -1,0 +1,9 @@
+EBT (Trước thuế): 399000.00
+ Profit(Sau Thuế): 359100.00
+ Ratio: 90.00
+Timestamp: NOW
+Revenue: 10000.00 | Expenses: 1000.00 | Tax: 10.00%
+EBT: 9000.00
+Net Income: 8100.00
+Ratio: 90.00%
+-------------------
