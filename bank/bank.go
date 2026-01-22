@@ -1,16 +1,15 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"os"
-	"strconv"
+
+	"examle.com/bank/fileops"
 )
 
 const balanceFileName = "balance.txt"
 
 func main() {
-	var accountBalance, err = readBalanceFromFile()
+	var accountBalance, err = fileops.ReadBalanceFromFile(balanceFileName)
 
 	if err != nil {
 		fmt.Println("ERROR")
@@ -38,7 +37,7 @@ func main() {
 			}
 
 			accountBalance += despositAmount
-			writeBalanceToFile(accountBalance)
+			fileops.WriteBalanceToFile(balanceFileName, accountBalance)
 			fmt.Printf("Balance update! Your Balance: %v \n ", accountBalance)
 		case 3:
 			fmt.Print("WithDraw Money: ")
@@ -53,7 +52,7 @@ func main() {
 				fmt.Println("Not enought money in your account")
 			} else {
 				accountBalance -= withDrawAmount
-				writeBalanceToFile(accountBalance)
+				fileops.WriteBalanceToFile(balanceFileName, accountBalance)
 				fmt.Printf("Successly withdraw %v$ !! Your Balance: %v$ \n", withDrawAmount, accountBalance)
 			}
 		default:
@@ -61,32 +60,4 @@ func main() {
 			return
 		}
 	}
-}
-
-func showMenu() {
-	fmt.Println("What do you want to do?")
-	fmt.Println("1. Check balance")
-	fmt.Println("2. Deposit money")
-	fmt.Println("3. Withdraw money")
-	fmt.Println("4. Exit")
-}
-
-func writeBalanceToFile(balance float64) {
-	balanceText := fmt.Sprint(balance)
-	os.WriteFile(balanceFileName, []byte(balanceText), 0644)
-}
-
-func readBalanceFromFile() (float64, error) {
-	data, err := os.ReadFile(balanceFileName)
-
-	if err != nil {
-		return 1000, errors.New("Fail to find balance file")
-	}
-	balanceText := string(data)
-	balance, err := strconv.ParseFloat(balanceText, 64)
-
-	if err != nil {
-		return 1000, errors.New("Fail to convert balance")
-	}
-	return balance, nil
 }
