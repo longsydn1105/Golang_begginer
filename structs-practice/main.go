@@ -29,6 +29,7 @@ type outputtable interface {
 }
 
 func main() {
+	printSomething(123)
 	title, content := getNoteData()
 	todoText := getUserInput("To do Text: ")
 
@@ -93,4 +94,11 @@ func saveData(data saver) error {
 func outputData(data outputtable) error {
 	data.Display()
 	return saveData(data)
+}
+
+func printSomething(T any) {
+	typedVal, ok := T.(int)
+
+	fmt.Println(typedVal)
+	fmt.Println(ok)
 }
