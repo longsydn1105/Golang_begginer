@@ -1,4 +1,4 @@
-package main
+package list
 
 import "fmt"
 
@@ -8,9 +8,7 @@ import "fmt"
 // 	price float64
 // }
 
-
-
-func  main() {
+func main() {
 	prices := []float64{10.99, 8.99}
 	fmt.Println(prices[0:1])
 	prices[1] = 9.99
@@ -23,6 +21,7 @@ func  main() {
 	prices = append(prices, discountPrices...)
 	fmt.Println(prices)
 }
+
 // func main() {
 // 	// 1)
 // 	hobby := [3]string{"code", "gym", "sleep"}
