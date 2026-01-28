@@ -7,8 +7,13 @@ import (
 	"os"
 )
 
-func ReadLines(path string) ([]string, error) {
-	file, err := os.Open(path)
+type FileManager struct {
+	IntputPath     string
+	OutputFilePath string
+}
+
+func (fm FileManager) ReadLines() ([]string, error) {
+	file, err := os.Open(fm.IntputPath)
 
 	if err != nil {
 		return nil, errors.New("ERROR: Fail to open File")
@@ -30,8 +35,8 @@ func ReadLines(path string) ([]string, error) {
 	return lines, nil
 }
 
-func WriteJSON(path string, data any) error {
-	file, err := os.Create(path)
+func (fm FileManager) WriteResult(data any) error {
+	file, err := os.Create(fm.IntputPath)
 
 	if err != nil {
 		return errors.New("ERROR: Fail to create file")
@@ -47,4 +52,11 @@ func WriteJSON(path string, data any) error {
 
 	file.Close()
 	return nil
+}
+
+func New(inputPath, outputPath string) FileManager {
+	return FileManager{
+		IntputPath:     inputPath,
+		OutputFilePath: outputPath,
+	}
 }
