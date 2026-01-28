@@ -4,35 +4,37 @@ import (
 	"fmt"
 
 	"gmo.com/calculator/conversion"
-	"gmo.com/calculator/filemanager"
+	"gmo.com/calculator/iomanager"
 )
 
 type TaxIncludedPriceJob struct {
-	IOManager        filemanager.FileManager `json:"-"`
-	TaxRate          float64                 `json:"tax_rate"`
-	InputPrices      []float64               `json:"input_prices"`
-	TaxIncludePrices map[string]string       `json:"tax_included_price"`
+	IOManager        iomanager.IOManager `json:"-"`
+	TaxRate          float64             `json:"tax_rate"`
+	InputPrices      []float64           `json:"input_prices"`
+	TaxIncludePrices map[string]string   `json:"tax_included_price"`
 }
 
-func (job *TaxIncludedPriceJob) LoadData() {
+func (job *TaxIncludedPriceJob) LoadData() error {
 
 	lines, err := job.IOManager.ReadLines()
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 
 	prices, err := conversion.StringsToFloats(lines)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 
 	job.InputPrices = prices
+	return nil
 }
 
-func (job *TaxIncludedPriceJob) Process() {
-	job.LoadData()
+func (job *TaxIncludedPriceJob) Process() error {
+	err := job.LoadData()
+	if err != nil {
+		return err 
+	}
 	result := make(map[string]string)
 
 	for _, price := range job.InputPrices {
@@ -41,12 +43,12 @@ func (job *TaxIncludedPriceJob) Process() {
 	}
 
 	job.TaxIncludePrices = result
-	job.IOManager.WriteResult(job)
+	return job.IOManager.WriteResult(job)
 }
 
-func NewTaxIncludedPriceJob(fm filemanager.FileManager, taxRate float64) *TaxIncludedPriceJob {
+func NewTaxIncludedPriceJob(iom iomanager.IOManager, taxRate float64) *TaxIncludedPriceJob {
 	return &TaxIncludedPriceJob{
-		IOManager:   fm,
+		IOManager:   iom,
 		TaxRate:     taxRate,
 		InputPrices: []float64{10, 20, 30},
 	}

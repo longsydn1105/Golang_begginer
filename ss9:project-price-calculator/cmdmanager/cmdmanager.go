@@ -13,7 +13,7 @@ func (cmd CMDManager) ReadLines() ([]string, error) {
 	for {
 		var price string
 		fmt.Print("Print: ")
-		fmt.Scan(price)
+		fmt.Scan(&price)
 
 		if price == "0" {
 			break
