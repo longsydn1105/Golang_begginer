@@ -8,12 +8,12 @@ import (
 )
 
 type FileManager struct {
-	IntputFilePath string
+	InputFilePath  string
 	OutputFilePath string
 }
 
 func (fm FileManager) ReadLines() ([]string, error) {
-	file, err := os.Open(fm.IntputFilePath)
+	file, err := os.Open(fm.OutputFilePath)
 
 	if err != nil {
 		return nil, errors.New("ERROR: Fail to open File")
@@ -36,7 +36,7 @@ func (fm FileManager) ReadLines() ([]string, error) {
 }
 
 func (fm FileManager) WriteResult(data any) error {
-	file, err := os.Create(fm.IntputFilePath)
+	file, err := os.Create(fm.InputFilePath)
 
 	if err != nil {
 		return errors.New("ERROR: Fail to create file")
@@ -56,7 +56,7 @@ func (fm FileManager) WriteResult(data any) error {
 
 func New(inputPath, outputPath string) FileManager {
 	return FileManager{
-		IntputFilePath: inputPath,
+		InputFilePath:  inputPath,
 		OutputFilePath: outputPath,
 	}
 }
