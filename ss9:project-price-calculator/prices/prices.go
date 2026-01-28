@@ -17,6 +17,10 @@ type TaxIncludedPriceJob struct {
 func (job *TaxIncludedPriceJob) LoadData() {
 
 	lines, err := job.IOManager.ReadLines()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	prices, err := conversion.StringsToFloats(lines)
 	if err != nil {
@@ -44,6 +48,6 @@ func NewTaxIncludedPriceJob(fm filemanager.FileManager, taxRate float64) *TaxInc
 	return &TaxIncludedPriceJob{
 		IOManager:   fm,
 		TaxRate:     taxRate,
-		InputPrices: []float64{},
+		InputPrices: []float64{10, 20, 30},
 	}
 }
