@@ -12,10 +12,10 @@ type Event struct {
 	Description string    `binding:"required"`
 	Location    string    `binding:"required"`
 	Datetime    time.Time `binding:"required"`
-	UserID      int
+	UserID      int64
 }
 
-func (e Event) Save() error {
+func (e *Event) Save() error {
 	query := `
 	INSERT INTO events(name, description, location, dateTime, user_id)
 	VALUES (?,?,?,?,?)`
@@ -108,6 +108,6 @@ func (e Event) Delete() error {
 	}
 	defer stmt.Close()
 
-	_ , err = stmt.Exec(e.ID)
+	_, err = stmt.Exec(e.ID)
 	return err
 }
