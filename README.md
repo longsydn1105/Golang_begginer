@@ -1,4 +1,4 @@
-[GOLANG 2edac12954d180809675ddd633368c62.md](https://github.com/user-attachments/files/24876791/GOLANG.2edac12954d180809675ddd633368c62.md)
+[GOLANG 2edac12954d180809675ddd633368c62.md](https://github.com/user-attachments/files/25007937/GOLANG.2edac12954d180809675ddd633368c62.md)
 # GOLANG
 
 ```jsx
@@ -89,3 +89,9 @@ Mọi câu trả lời về kỹ thuật PHẢI tuân theo cấu trúc Markdown 
 [Array, Slice, Maps](https://www.notion.so/Array-Slice-Maps-2f4ac12954d180619642c4380dc8e6da?pvs=21)
 
 [Function: Deep Dive](https://www.notion.so/Function-Deep-Dive-2f5ac12954d18053be74dff15f37b4dc?pvs=21)
+
+[GoRotine & Channel](https://www.notion.so/GoRotine-Channel-2f6ac12954d18093b0bdf85cea796b9a?pvs=21)
+
+[GARBAGE COLLENCTION](https://www.notion.so/GARBAGE-COLLENCTION-2f8ac12954d180718ab8eb0d5dd56b19?pvs=21)
+
+[GIN FRAMEWORK](https://www.notion.so/GIN-FRAMEWORK-2f8ac12954d180cba61ae62b79ea5396?pvs=21)
