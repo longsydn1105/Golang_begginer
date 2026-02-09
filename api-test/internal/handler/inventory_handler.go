@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const MaxSizeFile = 50 << 20
+const MaxSizeFile = 1000 << 20
 
 type InventoryHandler struct {
 	service interfaces.InventoryServiceInterface

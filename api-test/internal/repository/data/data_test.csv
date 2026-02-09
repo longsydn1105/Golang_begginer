@@ -1,7 +1,0 @@
-product_sku,category_code,warehouse_code,quantity,transaction_type
-IP15,ELEC,HN,100,IN
-MACBOOK,ELEC,HCM,50,IN
-SHIRT_L,FASH,HN,20,OUT
-IP15,ELEC,WH_FAKE,10,IN
-FAKE_SKU,ELEC,WH_HN,5,IN
-SHIRT_L,FASH,DN,20,OUT

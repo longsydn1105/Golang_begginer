@@ -6,10 +6,18 @@ import (
 	"api-test/internal/models"
 	"encoding/csv"
 	"errors"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
+)
+
+const (
+	WorkerCount = 10
+	BatchSize   = 5000
 )
 
 type inventoryService struct {
@@ -21,6 +29,8 @@ func NewInventoryService(repo interfaces.InventoryRepositoryInterface) interface
 }
 
 func (s *inventoryService) ProccessUploadCSV(file multipart.File) (*dto.ImportResult, error) {
+	startTotal := time.Now()
+
 	productMap, categoryMap, warehouseMap, err := s.repo.GetMasterData()
 	if err != nil {
 		return nil, err
@@ -32,11 +42,31 @@ func (s *inventoryService) ProccessUploadCSV(file multipart.File) (*dto.ImportRe
 		return nil, err
 	}
 
-	var validRecords []models.InventoryTransaction
-	var errorList []dto.ImportErrorDetail
-	rowNumber := 1
+	// --- THIẾT LẬP WORKER POOL ---
+	jobs := make(chan []models.InventoryTransaction, WorkerCount)
+	results := make(chan int, WorkerCount)
+	var wg sync.WaitGroup
 
-	// 4. Loop đọc file
+	// Khởi động các workers
+	for w := 0; w < WorkerCount; w++ {
+		wg.Add(1)
+		go s.workerInsert(w, jobs, results, &wg)
+	}
+
+	
+	totalSuccess := 0
+	done := make(chan bool)
+	go func() {
+		for count := range results {
+			totalSuccess += count
+		}
+		done <- true
+	}()
+
+	var currentBatch []models.InventoryTransaction
+	var errorList []dto.ImportErrorDetail
+	rowNumber := 1 
+
 	for {
 		record, err := reader.Read()
 		if err == io.EOF {
@@ -49,33 +79,64 @@ func (s *inventoryService) ProccessUploadCSV(file multipart.File) (*dto.ImportRe
 		}
 		rowNumber++
 
-		// --- ĐOẠN NÀY ĐÃ ĐƯỢC TÁCH RA HÀM RIÊNG ---
-		// Gọi đệ tử `validateAndMapRow` vào làm việc chi tiết
 		transaction, errDetail := s.validateAndMapRow(record, rowNumber, productMap, categoryMap, warehouseMap)
 
 		if errDetail != nil {
-			// Nếu có lỗi -> Ghi sổ đen
 			errorList = append(errorList, *errDetail)
 		} else {
-			// Nếu ngon lành -> Gom hàng
-			validRecords = append(validRecords, *transaction)
+			currentBatch = append(currentBatch, *transaction)
+		}
+
+		if len(currentBatch) >= BatchSize {
+			batchToSend := make([]models.InventoryTransaction, len(currentBatch))
+			copy(batchToSend, currentBatch)
+
+			jobs <- batchToSend 
+			currentBatch = make([]models.InventoryTransaction, 0, BatchSize)
 		}
 	}
 
-	// 5. Bulk Insert
-	if len(validRecords) > 0 {
-		if err := s.repo.BulkInsert(validRecords); err != nil {
-			return nil, err
-		}
+	if len(currentBatch) > 0 {
+		jobs <- currentBatch
 	}
 
-	// 6. Trả kết quả
+
+	close(jobs)   
+	wg.Wait()      
+	close(results) 
+	<-done      
+
+	totalDuration := time.Since(startTotal)
+	fmt.Println("------------------------------------------------")
+	fmt.Printf("🚀 Tốc độ BÀN THỜ (Validation + Concurrency)\n")
+	fmt.Printf("✅ Tổng thời gian: %v\n", totalDuration)
+	fmt.Printf("📦 Đã Insert thành công: %d dòng\n", totalSuccess)
+	fmt.Printf("❌ Số dòng lỗi: %d dòng\n", len(errorList))
+
+	if totalDuration.Seconds() > 0 {
+		speed := float64(rowNumber-1) / totalDuration.Seconds()
+		fmt.Printf("⚡ Tốc độ xử lý: %.0f dòng/giây\n", speed)
+	}
+	fmt.Println("------------------------------------------------")
+
 	return &dto.ImportResult{
 		TotalRows:   rowNumber - 1,
-		SuccessRows: len(validRecords),
+		SuccessRows: totalSuccess,
 		ErrorRows:   len(errorList),
 		ErrorList:   errorList,
 	}, nil
+}
+
+func (s *inventoryService) workerInsert(id int, jobs <-chan []models.InventoryTransaction, results chan<- int, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	for batch := range jobs {
+		if err := s.repo.BulkInsert(batch); err == nil {
+			results <- len(batch)
+		} else {
+			fmt.Printf("Worker %d bị lỗi: %v\n", id, err)
+		}
+	}
 }
 
 func (s *inventoryService) validateHeader(reader *csv.Reader) error {

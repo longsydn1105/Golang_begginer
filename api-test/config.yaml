@@ -1,3 +1,0 @@
-database:
-  # Thay password, dbname bằng thông tin thật của ông trong DBeaver
-  dsn: "host=localhost user=postgres password=123456 dbname=inventory_db port=5432 sslmode=disable TimeZone=Asia/Ho_Chi_Minh"

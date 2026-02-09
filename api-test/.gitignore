@@ -1,0 +1,21 @@
+# --- Cấu hình (Config & Secrets) ---
+config.yaml
+.env
+*.env
+
+# --- Dữ liệu (Data & Logs) ---
+*.csv
+*.xlsx
+*.log
+internal/repository/data # Chặn cả thư mục data nếu cần
+
+# --- File hệ thống/IDE (Rác của máy tính) ---
+.DS_Store
+.idea/
+.vscode/
+
+# --- Go Build (File chạy sau khi build) ---
+/bin/
+/dist/
+main
+main.exe
