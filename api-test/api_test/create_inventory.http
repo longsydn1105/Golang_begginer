@@ -1,0 +1,10 @@
+### Upload CSV File (Data nằm trong internal)
+POST http://localhost:8080/api/v1/upload
+Content-Type: multipart/form-data; boundary=MEO_MEO_BOUNDARY
+
+--MEO_MEO_BOUNDARY
+Content-Disposition: form-data; name="file"; filename="data_test.csv"
+Content-Type: text/csv
+
+< ../internal/repository/data/data_test.csv
+--MEO_MEO_BOUNDARY--
