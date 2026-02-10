@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  # 1. App Go
+  api_server:
+    build: .
+    container_name: go_api_container
+    ports:
+      - "${APP_PORT:-8080}:8080" # Lấy port từ .env, nếu ko có thì mặc định 8080
+    depends_on:
+      - db_postgres
+    environment:
+      # 👇 App Go sẽ đọc mấy biến này để tạo DSN
+      # Lưu ý: Host phải là tên service bên dưới (db_postgres), KHÔNG phải localhost
+      - DB_HOST=db_postgres
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - TZ=${DB_TIMEZONE} # Set múi giờ cho Container App
+    networks:
+      - my_network
+
+  # 2. Database Postgres
+  db_postgres:
+    image: postgres:15-alpine
+    container_name: postgres_db_container
+    environment:
+      # 👇 Postgres dùng biến riêng của nó, mình map giá trị từ .env vào
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - TZ=${DB_TIMEZONE} # Set múi giờ cho DB (Quan trọng để lưu giờ VN)
+    ports:
+      - "${DB_PORT}:5432" # Map cổng 5432 ra ngoài để ông dùng DBeaver
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
+
+volumes:
+  pg_data:

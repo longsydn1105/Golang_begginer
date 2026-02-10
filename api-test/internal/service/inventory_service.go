@@ -53,7 +53,6 @@ func (s *inventoryService) ProccessUploadCSV(file multipart.File) (*dto.ImportRe
 		go s.workerInsert(w, jobs, results, &wg)
 	}
 
-	
 	totalSuccess := 0
 	done := make(chan bool)
 	go func() {
@@ -65,7 +64,7 @@ func (s *inventoryService) ProccessUploadCSV(file multipart.File) (*dto.ImportRe
 
 	var currentBatch []models.InventoryTransaction
 	var errorList []dto.ImportErrorDetail
-	rowNumber := 1 
+	rowNumber := 1
 
 	for {
 		record, err := reader.Read()
@@ -91,7 +90,7 @@ func (s *inventoryService) ProccessUploadCSV(file multipart.File) (*dto.ImportRe
 			batchToSend := make([]models.InventoryTransaction, len(currentBatch))
 			copy(batchToSend, currentBatch)
 
-			jobs <- batchToSend 
+			jobs <- batchToSend
 			currentBatch = make([]models.InventoryTransaction, 0, BatchSize)
 		}
 	}
@@ -100,11 +99,10 @@ func (s *inventoryService) ProccessUploadCSV(file multipart.File) (*dto.ImportRe
 		jobs <- currentBatch
 	}
 
-
-	close(jobs)   
-	wg.Wait()      
-	close(results) 
-	<-done      
+	close(jobs)
+	wg.Wait()
+	close(results)
+	<-done
 
 	totalDuration := time.Since(startTotal)
 	fmt.Println("------------------------------------------------")
@@ -114,6 +112,7 @@ func (s *inventoryService) ProccessUploadCSV(file multipart.File) (*dto.ImportRe
 	fmt.Printf("❌ Số dòng lỗi: %d dòng\n", len(errorList))
 
 	if totalDuration.Seconds() > 0 {
+
 		speed := float64(rowNumber-1) / totalDuration.Seconds()
 		fmt.Printf("⚡ Tốc độ xử lý: %.0f dòng/giây\n", speed)
 	}
